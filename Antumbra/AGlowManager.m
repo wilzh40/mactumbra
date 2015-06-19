@@ -8,12 +8,15 @@
 
 #import "AGlowManager.h"
 
-@implementation AGlowManager {
+@implementation AGlowManager{
     AnCtx *context;
     BOOL mirroring;
     BOOL canMirror;
     NSTimer *timer;
     AGlowFade *currentFade;
+    AVAudioRecorder *recorder;
+    NSTimer *levelTimer;
+    double lowPassResults;
 }
 
 @synthesize glows;
@@ -29,10 +32,57 @@
         currentFade = nil;
         [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(stopedMirroring) name:@"doneMirroring" object:nil];
         [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(fadeTick) name:@"fadeTick" object:nil];
+        
+        // Meter audio
+        [self setupAudio];
+        levelTimer = [NSTimer scheduledTimerWithTimeInterval: 0.08 target: self selector: @selector(meterAudio) userInfo: nil repeats: YES];
+        
+
         [self scanForGlows];
         
     }
     return self;
+}
+
+
+
+
+- (void)setupAudio
+{
+    NSURL *url = [NSURL fileURLWithPath:@"/dev/null"];
+    
+    NSDictionary *settings = [NSDictionary dictionaryWithObjectsAndKeys:
+                              [NSNumber numberWithFloat: 44100.0],                 AVSampleRateKey,
+                              [NSNumber numberWithInt: kAudioFormatAppleLossless], AVFormatIDKey,
+                              [NSNumber numberWithInt: 1],                         AVNumberOfChannelsKey,
+                              [NSNumber numberWithInt: AVAudioQualityMax],         AVEncoderAudioQualityKey,
+                              nil];
+    
+    NSError *error;
+    
+    recorder = [[AVAudioRecorder alloc] initWithURL:url settings:settings error:&error];
+    
+    if (recorder) {
+        [recorder prepareToRecord];
+        recorder.meteringEnabled = YES;
+        [recorder record];
+    } else
+        NSLog([error description]);
+   
+}
+
+- (void)meterAudio
+{
+    [recorder updateMeters];
+    
+    const double ALPHA = 0.05;
+    double peakPowerForChannel = pow(10, (0.05 * [recorder peakPowerForChannel:0]));
+    lowPassResults = ALPHA * peakPowerForChannel + (1.0 - ALPHA) * lowPassResults;
+    // 30 is an arbitrary number that just works well...
+    [self brightness:lowPassResults*30];
+    
+    NSLog(@"Average input: %f Peak input: %f Low pass results: %f", [recorder averagePowerForChannel:0], peakPowerForChannel, lowPassResults);
+    
 }
 
 - (void)scanForGlows

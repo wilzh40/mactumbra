@@ -24,7 +24,7 @@
 		018AB38519D9221B006CA84D /* ReactiveView.m in Sources */ = {isa = PBXBuildFile; fileRef = 018AB38419D9221B006CA84D /* ReactiveView.m */; };
 		01B164FE19F1E73D0034E324 /* DescriptiveView.m in Sources */ = {isa = PBXBuildFile; fileRef = 01B164FD19F1E73D0034E324 /* DescriptiveView.m */; };
 		01B28D29199C412400F2117D /* ScreenColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 01B28D28199C412400F2117D /* ScreenColor.m */; };
-		01BE6D9C19A143B2008F72F7 /* GPUImage.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 011351B419A142870056A412 /* GPUImage.framework */; };
+		01BE6D9C19A143B2008F72F7 /* GPUImage.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 011351B419A142870056A412 /* GPUImage.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		01D3EBC61A95326C00F4B34C /* AGlowManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 01D3EBC51A95326C00F4B34C /* AGlowManager.m */; };
 		01D3EBCC1A95E1A500F4B34C /* AGlowFade.m in Sources */ = {isa = PBXBuildFile; fileRef = 01D3EBCB1A95E1A500F4B34C /* AGlowFade.m */; };
 		01D3EBCF1A95E24100F4B34C /* AGlowHSVFade.m in Sources */ = {isa = PBXBuildFile; fileRef = 01D3EBCE1A95E24100F4B34C /* AGlowHSVFade.m */; };
@@ -34,6 +34,7 @@
 		01EECC3519CF1A73005B4DDC /* MenuView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 01EECC3419CF1A73005B4DDC /* MenuView.xib */; };
 		01EECC3819CF1B04005B4DDC /* MenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 01EECC3719CF1B04005B4DDC /* MenuViewController.m */; };
 		01FF7DB719D115FA00C3A42D /* AGlow.m in Sources */ = {isa = PBXBuildFile; fileRef = 01FF7DB619D115FA00C3A42D /* AGlow.m */; };
+		77C5AF131B3408CD007037BB /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77C5AF121B3408CD007037BB /* AVFoundation.framework */; };
 		BC91577E1A972A3900298206 /* icon64.png in Resources */ = {isa = PBXBuildFile; fileRef = BC91577D1A972A3900298206 /* icon64.png */; };
 /* End PBXBuildFile section */
 
@@ -97,6 +98,9 @@
 		01EECC3719CF1B04005B4DDC /* MenuViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MenuViewController.m; sourceTree = "<group>"; };
 		01FF7DB519D115FA00C3A42D /* AGlow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AGlow.h; sourceTree = "<group>"; };
 		01FF7DB619D115FA00C3A42D /* AGlow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AGlow.m; sourceTree = "<group>"; };
+		77C5AF121B3408CD007037BB /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		77C5AF141B3408D9007037BB /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
+		77C5AF161B3409A7007037BB /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		BC91577D1A972A3900298206 /* icon64.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon64.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -105,6 +109,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				77C5AF131B3408CD007037BB /* AVFoundation.framework in Frameworks */,
 				013DD4EE1A81A3020056BE7A /* libantumbra.framework in Frameworks */,
 				01486F1D195CDE2A00F38387 /* Cocoa.framework in Frameworks */,
 				011351B519A142870056A412 /* GPUImage.framework in Frameworks */,
@@ -143,6 +148,9 @@
 		01486F1B195CDE2A00F38387 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				77C5AF161B3409A7007037BB /* AudioToolbox.framework */,
+				77C5AF141B3408D9007037BB /* CoreAudio.framework */,
+				77C5AF121B3408CD007037BB /* AVFoundation.framework */,
 				013DD4ED1A81A3020056BE7A /* libantumbra.framework */,
 				011351B419A142870056A412 /* GPUImage.framework */,
 				01486F1C195CDE2A00F38387 /* Cocoa.framework */,
@@ -265,7 +273,7 @@
 		01486F11195CDE2A00F38387 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0630;
 				ORGANIZATIONNAME = Antumbra;
 			};
 			buildConfigurationList = 01486F14195CDE2A00F38387 /* Build configuration list for PBXProject "Antumbra" */;
