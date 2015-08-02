@@ -17,6 +17,7 @@
     AVAudioRecorder *recorder;
     NSTimer *levelTimer;
     double lowPassResults;
+    double amplitudes[43];
 }
 
 @synthesize glows;
@@ -35,9 +36,9 @@
         
         // Meter audio
         [self setupAudio];
-        levelTimer = [NSTimer scheduledTimerWithTimeInterval: 0.08 target: self selector: @selector(meterAudio) userInfo: nil repeats: YES];
+        levelTimer = [NSTimer scheduledTimerWithTimeInterval: 0.001 target: self selector: @selector(meterAudio) userInfo: nil repeats: YES];
         
-
+        
         [self scanForGlows];
         
     }
@@ -68,20 +69,52 @@
         [recorder record];
     } else
         NSLog([error description]);
-   
+    
 }
 
 - (void)meterAudio
 {
     [recorder updateMeters];
+    //
+    //    const double ALPHA = 0.05;
+    //    double peakPowerForChannel = pow(10, (0.05 * [recorder peakPowerForChannel:0]));
+    //    lowPassResults = ALPHA * peakPowerForChannel + (1.0 - ALPHA) * lowPassResults;
+    //    // 30 is an arbitrary number that just works well...
+    //    [self brightness:lowPassResults*
+    double peakPowerForChannel = [recorder peakPowerForChannel:0];//pow(10, (0.05 * [recorder peakPowerForChannel:1]));
+    int frameSize = 43;
+    double average = 0;
+    double threshold = 1.3;
+    bool filled = true;
     
-    const double ALPHA = 0.05;
-    double peakPowerForChannel = pow(10, (0.05 * [recorder peakPowerForChannel:0]));
-    lowPassResults = ALPHA * peakPowerForChannel + (1.0 - ALPHA) * lowPassResults;
-    // 30 is an arbitrary number that just works well...
-    [self brightness:lowPassResults*30];
+    //double amplitudes[43];
+    //shift all
     
-    NSLog(@"Average input: %f Peak input: %f Low pass results: %f", [recorder averagePowerForChannel:0], peakPowerForChannel, lowPassResults);
+    for (int i = frameSize; i >= 1; i--) {
+        amplitudes[i] = amplitudes [i-1];
+        if (amplitudes[i] == 0)
+            false;
+    }
+    amplitudes[0] = peakPowerForChannel;
+    
+    if (filled) {
+        
+        for (int i = 1; i < frameSize; i++) {
+            average += amplitudes[i]/frameSize;
+            
+        }
+        if (peakPowerForChannel > average*threshold) {
+            // [self brightness: peakPowerForChannel];
+            [self brightness:1];
+            
+        } else {
+            [self brightness:0.1];
+        }
+    }
+    
+    
+    
+    NSLog(@"Current input: %f Average: %f Low pass results: %f", [recorder averagePowerForChannel:0], average, threshold);
     
 }
 
