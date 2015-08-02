@@ -8,6 +8,8 @@
 
 #import "AGlowManager.h"
 
+static vDSP_Length const FFTViewControllerFFTWindowSize = 4096;
+
 @implementation AGlowManager{
     AnCtx *context;
     BOOL mirroring;
@@ -36,7 +38,7 @@
         
         // Meter audio
         [self setupAudio];
-        levelTimer = [NSTimer scheduledTimerWithTimeInterval: 0.001 target: self selector: @selector(meterAudio) userInfo: nil repeats: YES];
+        levelTimer = [NSTimer scheduledTimerWithTimeInterval: 0.01 target: self selector: @selector(meterAudio) userInfo: nil repeats: YES];
         
         
         [self scanForGlows];
@@ -49,7 +51,9 @@
 
 
 - (void)setupAudio
+
 {
+    /*
     NSURL *url = [NSURL fileURLWithPath:@"/dev/null"];
     
     NSDictionary *settings = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -69,19 +73,50 @@
         [recorder record];
     } else
         NSLog([error description]);
+     */
+    self.microphone = [EZMicrophone microphoneWithDelegate:self];
+    self.microphone.microphoneOn = YES;
+    //EZAudioDevice *currentOutputDevice = [EZAudioDevice currentOutputDevice];
+    [self.microphone setDevice:[[EZAudioDevice inputDevices] firstObject]];
+    self.fft = [EZAudioFFTRolling fftWithWindowSize:FFTViewControllerFFTWindowSize
+                                         sampleRate:[EZMicrophone sharedMicrophone].audioStreamBasicDescription.mSampleRate
+                                           delegate:self];
+    [self.microphone startFetchingAudio];
+
+    
     
 }
 
-- (void)meterAudio
+-(void)   microphone:(EZMicrophone *)microphone
+    hasAudioReceived:(float **)buffer
+      withBufferSize:(UInt32)bufferSize
+withNumberOfChannels:(UInt32)numberOfChannels
 {
-    [recorder updateMeters];
-    //
-    //    const double ALPHA = 0.05;
-    //    double peakPowerForChannel = pow(10, (0.05 * [recorder peakPowerForChannel:0]));
-    //    lowPassResults = ALPHA * peakPowerForChannel + (1.0 - ALPHA) * lowPassResults;
-    //    // 30 is an arbitrary number that just works well...
-    //    [self brightness:lowPassResults*
-    double peakPowerForChannel = [recorder peakPowerForChannel:0];//pow(10, (0.05 * [recorder peakPowerForChannel:1]));
+    __weak typeof (self) weakSelf = self;
+    [self.fft computeFFTWithBuffer:buffer[0] withBufferSize:bufferSize];
+
+    // Getting audio data as an array of float buffer arrays that can be fed into the
+    // EZAudioPlot, EZAudioPlotGL, or whatever visualization you would like to do with
+    // the microphone data.
+    dispatch_async(dispatch_get_main_queue(),^{
+        // Visualize this data brah, buffer[0] = left channel, buffer[1] = right channel
+        //[weakSelf.audioPlot updateBuffer:buffer[0] withBufferSize:bufferSize];
+    });
+}
+
+- (void)        fft:(EZAudioFFT *)fft
+ updatedWithFFTData:(float *)fftData
+         bufferSize:(vDSP_Length)bufferSize
+{
+    
+    __weak typeof (self) weakSelf = self;
+    float factor = 100000;
+    float averageBass = 0;
+    for (int i = 0; i < bufferSize/3; i++) {
+        averageBass += fftData[i]/bufferSize/3*factor;
+    }
+    
+    double peakPowerForChannel =  averageBass;//[recorder peakPowerForChannel:0];//pow(10, (0.05 * [recorder peakPowerForChannel:1]));
     int frameSize = 43;
     double average = 0;
     double threshold = 1.3;
@@ -114,7 +149,7 @@
     
     
     
-    NSLog(@"Current input: %f Average: %f Low pass results: %f", [recorder averagePowerForChannel:0], average, threshold);
+    NSLog(@"Current input: %f Average: %f Low pass results: %f", averageBass, average, threshold);
     
 }
 

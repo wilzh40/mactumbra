@@ -1,3 +1,6 @@
 [submodule "deps"]
 	path = deps
 	url = https://github.com/TeamAntumbra/antumbra-deps
+[submodule "EZAudio"]
+	path = EZAudio
+	url = https://github.com/syedhali/EZAudio.git

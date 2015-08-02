@@ -15,8 +15,9 @@
 #import <GPUImage/GPUImage.h>
 #import "ScreenColor.h"
 #import "hsv.h"
+#import "EZAudio.h"
 
-@interface AGlowManager : NSObject
+@interface AGlowManager : NSObject <EZAudioFFTDelegate, EZMicrophoneDelegate>
 
 
 typedef struct {uint8_t r; uint8_t g; uint8_t b;} Color;
@@ -38,5 +39,8 @@ typedef struct {uint8_t r; uint8_t g; uint8_t b;} Color;
 
 @property (nonatomic, retain) NSMutableArray *glows;
 @property (nonatomic) int targetFPS;
+
+@property (nonatomic, strong) EZAudioFFTRolling *fft;
+@property (nonatomic, strong) EZMicrophone *microphone;
 
 @end
